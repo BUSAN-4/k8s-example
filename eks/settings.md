@@ -59,3 +59,7 @@ eksctl delete nodegroup \
   --cluster=busan \
   --name=spot-workers \
   --region=ap-northeast-2
+
+
+# 클러스터 삭제
+eksctl delete cluster -f k8s.yaml
