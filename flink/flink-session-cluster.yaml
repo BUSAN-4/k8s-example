@@ -2,7 +2,7 @@ apiVersion: flink.apache.org/v1beta1
 kind: FlinkDeployment
 metadata:
   name: flink-busan-cluster-20
-  namespace: flink-busan
+  namespace: flink
 spec:
   image: flink:2.0.1-java17
   flinkVersion: v2_0
@@ -11,7 +11,7 @@ spec:
     web.cancel.enable: 'true'
     web.submit.enable: "true"
 
-    taskmanager.numberOfTaskSlots: "16"
+    taskmanager.numberOfTaskSlots: "4"
 
     classloader.parent-first-patterns.defaults: 'java.;scala.;org.apache.flink.;org.apache.kafka.;org.apache.hadoop.;software.amazon.;org.apache.iceberg.;org.apache.parquet.'
 
@@ -19,13 +19,13 @@ spec:
   jobManager:
     replicas: 1
     resource:
-      memory: 8G
-      cpu: 4
+      memory: 4G
+      cpu: 2
   taskManager:
     replicas: 2
     resource:
-      memory: 16G
-      cpu: 8
+      memory: 4G
+      cpu: 1
   podTemplate:
     spec:
       initContainers:

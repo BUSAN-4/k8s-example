@@ -1,1 +1,0 @@
-helm install flink-kubernetes-operator flink-operator-repo/flink-kubernetes-operator -n flink-kubernetes-operator --create-namespace

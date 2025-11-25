@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: flink-sql-gateway-config-20
-  namespace: flink-busan
+  namespace: flink
 data:
   # 이 파일은 SQL Gateway Pod에 마운트됩니다.
   config.yaml: |+
@@ -29,7 +29,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: flink-sql-gateway-20
-  namespace: flink-busan
+  namespace: flink
 spec:
   replicas: 1
   selector:
@@ -197,7 +197,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sql-gateway-service-20
-  namespace: flink-busan
+  namespace: flink
 spec:
   selector:
     app: flink-sql-gateway-20
