@@ -4,7 +4,7 @@ kind: ClusterConfig
 metadata:
   name: busan
   region: ap-northeast-2
-  version: "1.31"  # 원하는 Kubernetes 버전
+  version: "1.34"  # 원하는 Kubernetes 버전
 
 # 기존 VPC 사용
 vpc:
