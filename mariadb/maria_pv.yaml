@@ -4,7 +4,7 @@ metadata:
   name: mariadb-pv-claim
   namespace: mariadb
 spec:
-  storageClassName: gp2
+  storageClassName: gp3
   accessModes:
     - ReadWriteOnce
   resources:
@@ -18,7 +18,7 @@ metadata:
   labels:
     type: local
 spec:
-  storageClassName: gp2
+  storageClassName: gp3
   capacity:
     storage: 5Gi
   accessModes:

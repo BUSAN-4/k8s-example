@@ -20,7 +20,7 @@ spec:
     replicas: 1
     resource:
       memory: 4G
-      cpu: 2
+      cpu: 1
   taskManager:
     replicas: 2
     resource:
@@ -85,9 +85,10 @@ spec:
               wget https://repo1.maven.org/maven2/org/antlr/antlr-runtime/3.5.2/antlr-runtime-3.5.2.jar
               
               # JDBC 접근 세팅
-              wget https://repo1.maven.org/maven2/org/apache/flink/flink-connector-jdbc-core/4.0.0-2.0/flink-connector-jdbc-core-4.0.0-2.0.jar
+              wget https://repo1.maven.org/maven2/org/apache/flink/flink-connector-jdbc/4.0.0-2.0/flink-connector-jdbc-4.0.0-2.0.jar
               wget https://repo1.maven.org/maven2/org/postgresql/postgresql/42.5.4/postgresql-42.5.4.jar
               wget https://repo1.maven.org/maven2/com/clickhouse/clickhouse-jdbc/0.9.4/clickhouse-jdbc-0.9.4.jar
+              wget https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.2.0/mysql-connector-j-8.2.0.jar -P /flink-libs/
               
               # HTTP 클라이언트 (필요시)
               # wget https://repo1.maven.org/maven2/org/apache/httpcomponents/httpclient/4.5.14/httpclient-4.5.14.jar
