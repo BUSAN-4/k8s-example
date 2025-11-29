@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: flink-sql-gateway-config-20
+  name: flink-sql-gateway-config-119
   namespace: flink
 data:
   # 이 파일은 SQL Gateway Pod에 마운트됩니다.
@@ -19,26 +19,51 @@ data:
     sql-gateway.endpoint.rest.address: 0.0.0.0
     sql-gateway.endpoint.rest.port: 8083
     
-    jobmanager.rpc.address: flink-busan-cluster-20-rest.flink-busan.svc.cluster.local
+    jobmanager.rpc.address: flink-learning-lab-cluster-119-rest.flink-learning-lab-iceberg.svc.cluster.local
     jobmanager.rpc.port: 6123
-    taskmanager.numberOfTaskSlots: "16"
-
+    
+    env.hadoop.conf.dir: "/hadoop/etc/hadoop"
+    fs.s3a.impl.disable.cache: "true"
     classloader.parent-first-patterns.defaults: 'java.;scala.;org.apache.flink.;org.apache.kafka.;org.apache.hadoop.;software.amazon.;org.apache.iceberg.;org.apache.parquet.'
+
+  log4j-console.properties: |
+    rootLogger.level=INFO
+    rootLogger.appenderRef.console.ref=ConsoleAppender
+    # ================================================================
+    # S3A 파일시스템 및 AWS SDK 디버그 로깅 활성화 (가장 중요)
+    # ================================================================
+    logger.s3a.name=org.apache.hadoop.fs.s3a
+    logger.s3a.level=DEBUG
+    logger.awssdk.name=com.amazonaws
+    logger.awssdk.level=DEBUG
+    # ================================================================
+    logger.flink.name=org.apache.flink
+    logger.flink.level=INFO
+    logger.kafka.name=org.apache.kafka
+    logger.kafka.level=WARN
+    logger.hadoop.name=org.apache.hadoop
+    logger.hadoop.level=WARN
+    logger.iceberg.name=org.apache.iceberg
+    logger.iceberg.level=INFO
+    appender.console.name=ConsoleAppender
+    appender.console.type=CONSOLE
+    appender.console.layout.type=PatternLayout
+    appender.console.layout.pattern=%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flink-sql-gateway-20
+  name: flink-sql-gateway-119
   namespace: flink
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: flink-sql-gateway-20
+      app: flink-sql-gateway-119
   template:
     metadata:
       labels:
-        app: flink-sql-gateway-20
+        app: flink-sql-gateway-119
     spec:
       initContainers:
         - name: python-init
@@ -48,10 +73,10 @@ spec:
             - -c
             - |
               pip3 install apache-flink==2.0.1
-              
+
               mkdir -p /python/link/bin
               mkdir -p /python/link/lib
-              
+
               cp -r /usr/local/bin/* /python/link/bin/
               cp -r /usr/local/lib/* /python/link/lib/
 
@@ -60,70 +85,52 @@ spec:
               mountPath: /python/link/bin
             - name: flink-python-lib-volume
               mountPath: /python/link/lib
-        - name: flink-lib-init
-          image: flink:2.0.1-java17
-          command:
-            - /bin/sh
-            - -c
-            - |
-              cp -r /opt/flink/lib/* /flink-libs
-              rm -rf /flink-libs/flink-shaded-hadoop-2-uber*
-              cp -r /opt/flink/plugins/* /flink-plugins
-              
-              cp -r /usr/local/bin/* /python/link/bin
-          volumeMounts:
-            - name: flink-lib-volume
-              mountPath: /flink-libs
-            - name: flink-plugin-volume
-              mountPath: /flink-plugins
-            - name: flink-python-bin-volume
-              mountPath: /python/link/bin
-            - name: flink-python-lib-volume
-              mountPath: /python/link/lib
         - name: dependency-downloader
-          image: apache/hadoop:3.3.5  # alpine:3.18
+          image: apache/hadoop:3.3.5
           command:
             - /bin/sh
             - -c
             - |
-
+              
               cp -r /opt/hadoop/* /hadoop
-
+              
               cd /flink-libs
-
+              
               # hive Metastore 접근 세팅
               wget https://repo1.maven.org/maven2/org/apache/hive/hive-exec/3.1.3/hive-exec-3.1.3.jar
               wget https://repo1.maven.org/maven2/org/apache/thrift/libfb303/0.9.3/libfb303-0.9.3.jar
               wget https://repo1.maven.org/maven2/org/antlr/antlr-runtime/3.5.2/antlr-runtime-3.5.2.jar
-
+              
               # JDBC 접근 세팅
-              wget https://repo1.maven.org/maven2/org/apache/flink/flink-connector-jdbc-core/4.0.0-2.0/flink-connector-jdbc-core-4.0.0-2.0.jar
               wget https://repo1.maven.org/maven2/org/postgresql/postgresql/42.5.4/postgresql-42.5.4.jar
-              wget https://repo1.maven.org/maven2/com/clickhouse/clickhouse-jdbc/0.9.4/clickhouse-jdbc-0.9.4.jar
+              wget https://repo1.maven.org/maven2/io/github/therealhieu/flink-connector-clickhouse/1.19.0-1.0.0/flink-connector-clickhouse-1.19.0-1.0.0.jar
+              wget https://repo1.maven.org/maven2/org/apache/flink/flink-connector-jdbc/3.3.0-1.19/flink-connector-jdbc-3.3.0-1.19.jar
+              wget https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/3.5.6/mariadb-java-client-3.5.6.jar
+              # wget https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/9.5.0/mysql-connector-j-9.5.0.jar
 
-              # 카프카 세팅
-              wget https://repo1.maven.org/maven2/org/apache/flink/flink-sql-connector-kafka/4.0.0-2.0/flink-sql-connector-kafka-4.0.0-2.0.jar
+              # Kafka 세팅
+              wget https://repo1.maven.org/maven2/org/apache/flink/flink-sql-connector-kafka/3.3.0-1.19/flink-sql-connector-kafka-3.3.0-1.19.jar
               wget https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/3.3.0/kafka-clients-3.3.0.jar
-              wget https://repo1.maven.org/maven2/org/apache/flink/flink-avro/2.0.1/flink-avro-2.0.1.jar
-              wget https://repo1.maven.org/maven2/org/apache/flink/flink-avro-confluent-registry/2.0.1/flink-avro-confluent-registry-2.0.1.jar
+              wget https://repo1.maven.org/maven2/org/apache/flink/flink-avro/1.19.3/flink-avro-1.19.3.jar
+              wget https://repo1.maven.org/maven2/org/apache/flink/flink-avro-confluent-registry/1.19.3/flink-avro-confluent-registry-1.19.3.jar
               wget https://packages.confluent.io/maven/io/confluent/kafka-schema-registry-client/7.0.16/kafka-schema-registry-client-7.0.16.jar
               wget https://repo1.maven.org/maven2/org/apache/avro/avro/1.10.2/avro-1.10.2.jar
               wget https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.13.5/jackson-databind-2.13.5.jar
               wget https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.13.5/jackson-core-2.13.5.jar
               wget https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.13.5/jackson-annotations-2.13.5.jar
-
+              
               mkdir -p /flink-plugins/s3-fs-hadoop
-
+              
               # iceberg 세팅
-              wget -P /flink-plugins/s3-fs-hadoop https://repo1.maven.org/maven2/org/apache/flink/flink-s3-fs-hadoop/2.0.1/flink-s3-fs-hadoop-2.0.1.jar
-              wget https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-flink-runtime-2.0/1.10.0/iceberg-flink-runtime-2.0-1.10.0.jar
-
+              wget -P /flink-plugins/s3-fs-hadoop https://repo1.maven.org/maven2/org/apache/flink/flink-s3-fs-hadoop/1.19.3/flink-s3-fs-hadoop-1.19.3.jar
+              wget https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-flink-runtime-1.19/1.6.0/iceberg-flink-runtime-1.19-1.6.0.jar
+              
               # paimon 세팅
-              wget https://repo.maven.apache.org/maven2/org/apache/paimon/paimon-flink-2.0/1.3.0/paimon-flink-2.0-1.3.0.jar
-
+              wget https://repo.maven.apache.org/maven2/org/apache/paimon/paimon-flink-1.19/1.3.0/paimon-flink-1.19-1.3.0.jar
+              
               # MinIO 세팅
-              wget https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.793/aws-java-sdk-bundle-1.12.793.jar
-
+              wget https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.11.1026/aws-java-sdk-bundle-1.11.1026.jar
+              
               # hadoop 3.3.5 세팅
               cp /hadoop/share/hadoop/common/hadoop-common-3.3.5.jar /flink-libs
               cp /hadoop/share/hadoop/common/lib/commons-configuration2-2.8.0.jar /flink-libs
@@ -152,7 +159,7 @@ spec:
             value: /hadoop
           - name: HADOOP_CLASSPATH
             value: /hadoop/etc/hadoop:/hadoop/share/hadoop/common/lib/*:/hadoop/share/hadoop/common/*:/hadoop/share/hadoop/hdfs:/hadoop/share/hadoop/hdfs/lib/*:/hadoop/share/hadoop/hdfs/*:/hadoop/share/hadoop/mapreduce/*:/hadoop/share/hadoop/yarn:/hadoop/share/hadoop/yarn/lib/*:/hadoop/share/hadoop/yarn/*
-        image: flink:2.0.1-java17
+        image: flink:1.19.3-scala_2.12-java11
         command: ["/opt/flink/bin/sql-gateway.sh", "start-foreground"]
         ports:
         - containerPort: 8083
@@ -165,45 +172,40 @@ spec:
             memory: "1Gi"
             cpu: "1"
         volumeMounts:
-          - name: hadoop
-            mountPath: /hadoop
-          - name: flink-python-bin-volume
-            mountPath: /usr/local/bin
-          - name: flink-python-lib-volume
-            mountPath: /usr/local/lib
-          - name: flink-lib-volume
-            mountPath: /opt/flink/lib
-          - name: flink-plugin-volume
-            mountPath: /opt/flink/plugins
-          - name: sql-gateway-config
-            mountPath: /opt/flink/conf/config.yaml
-            subPath: config.yaml
-      volumes:
-        - name: sql-gateway-config
-          configMap:
-            name: flink-sql-gateway-config-20
-        - name: flink-lib-volume
-          emptyDir: { }
-        - name: flink-plugin-volume
-          emptyDir: { }
-        - name: flink-python-bin-volume
-          emptyDir: { }
-        - name: flink-python-lib-volume
-          emptyDir: { }
         - name: hadoop
-          emptyDir: { }
+          mountPath: /hadoop
+        - name: flink-lib-volume
+          mountPath: /opt/flink/lib
+        - name: flink-plugin-volume
+          mountPath: /opt/flink/plugins
+        - name: flink-config-volume-119
+          mountPath: /opt/flink/conf/config.yaml
+          subPath: config.yaml
+        - name: flink-config-volume-119
+          mountPath: /opt/flink/conf/log4j-console.properties
+          subPath: log4j-console.properties
+      volumes:
+      - name: flink-config-volume-119
+        configMap:
+          name: flink-sql-gateway-config-119
+      - name: flink-plugin-volume
+        emptyDir: { }
+      - name: flink-lib-volume
+        emptyDir: { }
+      - name: hadoop
+        emptyDir: { }
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: sql-gateway-service-20
+  name: sql-gateway-service-119
   namespace: flink
 spec:
   selector:
-    app: flink-sql-gateway-20
+    app: flink-sql-gateway-119
   ports:
   - name: sql-gateway
     port: 8083
     targetPort: 8083
-    nodePort: 30109
+    nodePort: 30110
   type: NodePort
