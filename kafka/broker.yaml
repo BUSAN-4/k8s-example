@@ -6,7 +6,7 @@ metadata:
   labels:
     strimzi.io/cluster: kafka-cluster
 spec:
-  replicas: 2
+  replicas: 1
   roles:
     - broker
   storage:
@@ -15,6 +15,5 @@ spec:
       - id: 0
         type: persistent-claim
         size: 10Gi
-        class: gp3
         kraftMetadata: shared
         deleteClaim: false

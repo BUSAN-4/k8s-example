@@ -9,7 +9,7 @@ kubectl apply -f https://github.com/strimzi/strimzi-kafka-operator/releases/down
 ### Kafka Kubernetes Operator 설치
 
 ```bash
-helm install my-strimzi-kafka-operator oci://quay.io/strimzi-helm/strimzi-kafka-operator -n kafka-kubernetes-operator --create-namespace --version 0.47.0
+/c/Users/user/Desktop/git/bin/windows-amd64/helm install my-strimzi-kafka-operator oci://quay.io/strimzi-helm/strimzi-kafka-operator -n kafka-kubernetes-operator --create-namespace --version 0.47.0
 ```
 
 ### Kafka 배포

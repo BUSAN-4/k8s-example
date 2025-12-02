@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-sql-client
+  namespace: flink
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink-sql-client
+  template:
+    metadata:
+      labels:
+        app: flink-sql-client
+    spec:
+      containers:
+      - name: flink-sql-client
+        env:
+          - name: TZ
+            value: Asia/Seoul
+        image: flink:1.19.3-scala_2.12-java11
+        command: ["sleep", "infinity"]
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
