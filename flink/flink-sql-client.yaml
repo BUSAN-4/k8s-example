@@ -18,7 +18,7 @@ spec:
         env:
           - name: TZ
             value: Asia/Seoul
-        image: flink:1.19.3-scala_2.12-java11
+        image: flink:2.0.1-java17
         command: ["sleep", "infinity"]
         resources:
           requests:
