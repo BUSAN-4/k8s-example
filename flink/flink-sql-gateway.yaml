@@ -50,7 +50,6 @@ spec:
               rm -rf /flink-libs/flink-shaded-hadoop-2-uber*
               cp -r /opt/flink/plugins/* /flink-plugins
               
-              cp -r /usr/local/bin/* /python/link/bin
           volumeMounts:
             - name: flink-lib-volume
               mountPath: /flink-libs
@@ -87,8 +86,6 @@ spec:
               wget https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.13.5/jackson-databind-2.13.5.jar
               wget https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.13.5/jackson-core-2.13.5.jar
               wget https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.13.5/jackson-annotations-2.13.5.jar
-
-              mkdir -p /flink-plugins/s3-fs-hadoop
 
               # hadoop 3.3.5 세팅
               cp /hadoop/share/hadoop/common/hadoop-common-3.3.5.jar /flink-libs

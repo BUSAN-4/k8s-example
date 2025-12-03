@@ -99,8 +99,6 @@ spec:
               wget https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.13.5/jackson-core-2.13.5.jar
               wget https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.13.5/jackson-annotations-2.13.5.jar
 
-              mkdir -p /flink-plugins/s3-fs-hadoop
-
               # hadoop 3.3.5 세팅
               cp /hadoop/share/hadoop/common/hadoop-common-3.3.5.jar /flink-libs
               cp /hadoop/share/hadoop/common/lib/commons-configuration2-2.8.0.jar /flink-libs
