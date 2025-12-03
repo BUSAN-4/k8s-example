@@ -158,3 +158,16 @@ spec:
         - name: flink-usrlib-volume
           emptyDir: { }
   mode: standalone
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sql-gateway-service-20
+  namespace: flink-learning-lab
+spec:
+  selector:
+    app: flink-sql-gateway-20
+  ports:
+  - name: sql-gateway
+    port: 8083
+  type: ClusterIP
