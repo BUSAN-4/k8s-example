@@ -1274,7 +1274,7 @@ createUserJob:
 
 # Airflow database migration job settings
 migrateDatabaseJob:
-  enabled: false
+  enabled: true
   # Limit the lifetime of the job object after it finished execution.
   ttlSecondsAfterFinished: 300
   # Command to use when running the migrate database job (templated).

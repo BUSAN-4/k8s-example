@@ -19,7 +19,7 @@ data:
     sql-gateway.endpoint.rest.address: 0.0.0.0
     sql-gateway.endpoint.rest.port: 8083
     
-    jobmanager.rpc.address: fflink-cluster-20-rest.flink-cluster-20.svc.cluster.local
+    jobmanager.rpc.address: flink-cluster-20-rest.flink-cluster-20.svc.cluster.local
     jobmanager.rpc.port: 6123
 
     classloader.parent-first-patterns.defaults: 'java.;scala.;org.apache.flink.;org.apache.kafka.;org.apache.hadoop.;software.amazon.;org.apache.iceberg.;org.apache.parquet.'
@@ -155,3 +155,16 @@ spec:
           emptyDir: { }
         - name: hadoop
           emptyDir: { }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sql-gateway-service-20
+  namespace: flink
+spec:
+  selector:
+    app: flink-sql-gateway-20
+  ports:
+  - name: sql-gateway
+    port: 8083
+  type: ClusterIP
